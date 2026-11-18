@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Clientes</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2>Clientes</h2>
+            <p>Empresas e setores que utilizam a central de serviços.</p>
+        </div>
+        <a th:href="@{/clientes/novo}" class="botao botao-primario"
+           sec:authorize="hasAnyRole('GERENTE','ADMINISTRADOR')">
+            <i class="bi bi-plus-lg"></i> Novo cliente
+        </a>
+    </div>
+
+    <div class="cartao">
+        <div class="cartao-titulo">
+            <h3>Clientes cadastrados</h3>
+            <span th:text="${#lists.size(clientes)} + ' registro(s)'">0 registros</span>
+        </div>
+
+        <div class="table-responsive" th:if="${!#lists.isEmpty(clientes)}">
+            <table class="tabela">
+                <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Setor</th>
+                    <th>Telefone</th>
+                    <th>E-mail</th>
+                    <th>Situação</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cliente : ${clientes}">
+                    <td>
+                        <span class="principal" th:text="${cliente.nome}">Cliente</span>
+                        <span class="secundario"
+                              th:text="'Desde ' + ${#temporals.format(cliente.dataCadastro, 'dd/MM/yyyy')}">Desde</span>
+                    </td>
+                    <td th:text="${cliente.setor}">Setor</td>
+                    <td th:text="${cliente.telefone}">Telefone</td>
+                    <td th:text="${cliente.email} ?: '—'">E-mail</td>
+                    <td>
+                        <span class="selo" th:classappend="${cliente.ativo} ? 'selo-resolvido' : 'selo-cancelado'"
+                              th:text="${cliente.ativo} ? 'Ativo' : 'Inativo'">Ativo</span>
+                    </td>
+                    <td class="acoes" sec:authorize="hasAnyRole('GERENTE','ADMINISTRADOR')">
+                        <a th:href="@{/clientes/{id}/editar(id=${cliente.id})}"
+                           class="botao botao-claro botao-pequeno">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <form th:action="@{/clientes/{id}/excluir(id=${cliente.id})}" method="post"
+                              data-confirmar="Excluir este cliente?">
+                            <button type="submit" class="botao botao-perigo botao-pequeno">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="vazio" th:if="${#lists.isEmpty(clientes)}">
+            <i class="bi bi-people"></i>
+            <p class="mb-0">Nenhum cliente cadastrado.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

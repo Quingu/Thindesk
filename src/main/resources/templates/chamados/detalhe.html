@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${chamado.protocolo}">Chamado</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span style="font-size:.78rem;color:var(--cor-texto-fraco)" th:text="${chamado.protocolo}">TD-2026-0001</span>
+                <span class="selo" th:classappend="${chamado.situacao.classe}" th:text="${chamado.situacao.rotulo}">Aberto</span>
+                <span class="prioridade" th:classappend="${chamado.prioridade.classe}"
+                      th:text="${chamado.prioridade.rotulo}">Média</span>
+            </div>
+            <h2 th:text="${chamado.titulo}">Título do chamado</h2>
+            <p th:text="'Aberto em ' + ${#temporals.format(chamado.dataAbertura, 'dd/MM/yyyy HH:mm')}
+                        + ' por ' + ${chamado.solicitanteNome}">Aberto em ...</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/chamados}" class="botao botao-claro"><i class="bi bi-arrow-left"></i> Voltar</a>
+            <a th:href="@{/chamados/{id}/editar(id=${chamado.id})}" class="botao botao-primario"
+               th:if="${gestor or (chamado.situacao.name() == 'ABERTO' or chamado.situacao.name() == 'AGUARDANDO_CLIENTE')}">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+        </div>
+    </div>
+
+    <div class="detalhe-grade">
+        <div>
+            <div class="cartao" style="margin-bottom:1rem">
+                <div class="cartao-titulo">
+                    <h3><i class="bi bi-file-text me-1"></i> Descrição</h3>
+                    <span th:text="${chamado.tipo.rotulo}">Tipo</span>
+                </div>
+                <p style="white-space:pre-line;font-size:.9rem;margin:0" th:text="${chamado.descricao}">Descrição</p>
+
+                <div th:if="${chamado.situacao.name() == 'RESOLVIDO'}"
+                     class="alerta alerta-sucesso mt-3 mb-0" style="display:block">
+                    <strong><i class="bi bi-check-circle-fill"></i> Solução aplicada</strong>
+                    <div style="margin-top:.4rem;white-space:pre-line" th:text="${chamado.solucao}">Solução</div>
+                    <div style="margin-top:.3rem;font-size:.75rem"
+                         th:text="'Resolvido em ' + ${#temporals.format(chamado.dataResolucao, 'dd/MM/yyyy HH:mm')}">
+                        Resolvido em ...
+                    </div>
+                </div>
+            </div>
+
+            <div class="cartao">
+                <div class="cartao-titulo">
+                    <h3><i class="bi bi-chat-left-text me-1"></i> Histórico e comentários</h3>
+                    <span th:text="${#lists.size(chamado.comentarios)} + ' interação(ões)'">0</span>
+                </div>
+
+                <ul class="linha-tempo" th:if="${!#lists.isEmpty(chamado.comentarios)}">
+                    <li th:each="comentario : ${chamado.comentarios}">
+                        <span class="ponto"><i class="bi bi-chat-dots"></i></span>
+                        <span class="autor" th:text="${comentario.autor}">Autor</span>
+                        <span class="quando" th:text="${#temporals.format(comentario.dataCriacao, 'dd/MM/yyyy HH:mm')}">data</span>
+                        <div class="texto" th:text="${comentario.mensagem}">Mensagem</div>
+                    </li>
+                </ul>
+
+                <p class="dica-vazia" th:if="${#lists.isEmpty(chamado.comentarios)}">
+                    Nenhuma interação registrada até o momento.
+                </p>
+
+                <hr style="border-color:var(--cor-borda);margin:1.2rem 0">
+
+                <form th:action="@{/chamados/{id}/comentario(id=${chamado.id})}" th:object="${comentario}" method="post">
+                    <div class="campo mb-2">
+                        <label for="mensagem">Adicionar comentário</label>
+                        <textarea class="controle" id="mensagem" th:field="*{mensagem}" style="min-height:90px"
+                                  placeholder="Escreva uma atualização para o chamado"></textarea>
+                        <div class="erro-campo" th:if="${#fields.hasErrors('mensagem')}" th:errors="*{mensagem}"></div>
+                    </div>
+                    <button type="submit" class="botao botao-primario botao-pequeno">
+                        <i class="bi bi-send"></i> Enviar comentário
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <div class="cartao" style="margin-bottom:1rem">
+                <div class="cartao-titulo">
+                    <h3><i class="bi bi-info-circle me-1"></i> Detalhes</h3>
+                </div>
+                <ul class="lista-dados">
+                    <li><span class="rotulo">Protocolo</span><strong th:text="${chamado.protocolo}">TD</strong></li>
+                    <li><span class="rotulo">Cliente</span><strong th:text="${chamado.clienteNome} ?: '—'">—</strong></li>
+                    <li><span class="rotulo">Setor</span><strong th:text="${chamado.setor} ?: '—'">—</strong></li>
+                    <li><span class="rotulo">Solicitante</span><strong th:text="${chamado.solicitanteNome}">Nome</strong></li>
+                    <li><span class="rotulo">E-mail</span><strong th:text="${chamado.solicitanteEmail}">email</strong></li>
+                    <li><span class="rotulo">Técnico</span><strong th:text="${chamado.tecnico} ?: 'Não atribuído'">—</strong></li>
+                    <li><span class="rotulo">Tipo</span><strong th:text="${chamado.tipo.rotulo}">Tipo</strong></li>
+                    <li><span class="rotulo">Última atualização</span>
+                        <strong th:text="${#temporals.format(chamado.dataAtualizacao, 'dd/MM/yyyy HH:mm')}">data</strong>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="cartao" sec:authorize="hasAnyRole('GERENTE','ADMINISTRADOR')" style="margin-bottom:1rem">
+                <div class="cartao-titulo">
+                    <h3><i class="bi bi-sliders me-1"></i> Gestão do atendimento</h3>
+                </div>
+
+                <form th:action="@{/chamados/{id}/situacao(id=${chamado.id})}" method="post" class="campo">
+                    <label for="situacao">Situação</label>
+                    <div class="d-flex gap-2">
+                        <select name="situacao" id="situacao" class="controle">
+                            <option th:each="item : ${situacoes}" th:value="${item}"
+                                    th:text="${item.rotulo}" th:selected="${item == chamado.situacao}"
+                                    th:disabled="${item.name() == 'RESOLVIDO'}"></option>
+                        </select>
+                        <button type="submit" class="botao botao-primario botao-pequeno">Aplicar</button>
+                    </div>
+                </form>
+
+                <form th:action="@{/chamados/{id}/tecnico(id=${chamado.id})}" method="post" class="campo">
+                    <label for="tecnico">Técnico responsável</label>
+                    <div class="d-flex gap-2">
+                        <select name="tecnico" id="tecnico" class="controle">
+                            <option value="">Não atribuído</option>
+                            <option th:each="item : ${tecnicos}" th:value="${item.email}"
+                                    th:text="${item.nome}" th:selected="${item.email == chamado.tecnico}"></option>
+                        </select>
+                        <button type="submit" class="botao botao-primario botao-pequeno">Aplicar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="cartao" sec:authorize="hasAnyRole('GERENTE','ADMINISTRADOR')" style="margin-bottom:1rem"
+                 th:if="${chamado.situacao.name() != 'RESOLVIDO' and chamado.situacao.name() != 'CANCELADO'}">
+                <div class="cartao-titulo">
+                    <h3><i class="bi bi-check2-square me-1"></i> Resolver chamado</h3>
+                </div>
+                <form th:action="@{/chamados/{id}/resolver(id=${chamado.id})}" th:object="${resolucao}" method="post">
+                    <div class="campo">
+                        <textarea class="controle" th:field="*{solucao}" style="min-height:100px"
+                                  placeholder="Descreva a solução aplicada ao cliente"></textarea>
+                        <div class="erro-campo" th:if="${#fields.hasErrors('solucao')}" th:errors="*{solucao}"></div>
+                    </div>
+                    <button type="submit" class="botao botao-primario botao-pequeno">
+                        <i class="bi bi-check2-circle"></i> Marcar como resolvido
+                    </button>
+                </form>
+            </div>
+
+            <div class="cartao">
+                <div class="cartao-titulo">
+                    <h3><i class="bi bi-exclamation-octagon me-1"></i> Ações</h3>
+                </div>
+
+                <form th:action="@{/chamados/{id}/cancelar(id=${chamado.id})}" method="post"
+                      data-confirmar="Deseja realmente cancelar este chamado?"
+                      th:if="${chamado.situacao.name() != 'RESOLVIDO' and chamado.situacao.name() != 'CANCELADO'}">
+                    <button type="submit" class="botao botao-claro botao-pequeno w-100 mb-2">
+                        <i class="bi bi-x-circle"></i> Cancelar chamado
+                    </button>
+                </form>
+
+                <form th:action="@{/chamados/{id}/excluir(id=${chamado.id})}" method="post"
+                      data-confirmar="Excluir definitivamente este chamado?"
+                      sec:authorize="hasRole('ADMINISTRADOR')">
+                    <button type="submit" class="botao botao-perigo botao-pequeno w-100">
+                        <i class="bi bi-trash"></i> Excluir chamado
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

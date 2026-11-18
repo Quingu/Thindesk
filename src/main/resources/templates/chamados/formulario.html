@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${modoEdicao} ? 'Editar chamado' : 'Novo chamado'">Chamado</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2 th:text="${modoEdicao} ? 'Editar chamado' : 'Novo chamado'">Novo chamado</h2>
+            <p>Quanto mais detalhes, mais rápido conseguimos resolver.</p>
+        </div>
+        <a th:href="${modoEdicao} ? @{/chamados/{id}(id=${idChamado})} : @{/chamados}"
+           class="botao botao-claro">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="cartao">
+        <form th:action="${modoEdicao} ? @{/chamados/{id}/editar(id=${idChamado})} : @{/chamados/novo}"
+              th:object="${chamadoForm}" method="post">
+            <div class="grade-formulario">
+                <div class="campo largura-total">
+                    <label for="titulo">Título</label>
+                    <input type="text" class="controle" id="titulo" th:field="*{titulo}"
+                           placeholder="Resumo do problema em uma frase">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></div>
+                </div>
+
+                <div class="campo largura-total">
+                    <label for="descricao">Descrição</label>
+                    <textarea class="controle" id="descricao" th:field="*{descricao}"
+                              placeholder="Descreva o que aconteceu, desde quando e o impacto no seu trabalho."></textarea>
+                    <div class="erro-campo" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="tipo">Tipo de chamado</label>
+                    <select class="controle" id="tipo" th:field="*{tipo}">
+                        <option value="">Selecione</option>
+                        <option th:each="item : ${tipos}" th:value="${item}" th:text="${item.rotulo}"></option>
+                    </select>
+                    <div class="erro-campo" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="prioridade">Prioridade</label>
+                    <select class="controle" id="prioridade" th:field="*{prioridade}">
+                        <option value="">Selecione</option>
+                        <option th:each="item : ${prioridades}" th:value="${item}" th:text="${item.rotulo}"></option>
+                    </select>
+                    <div class="erro-campo" th:if="${#fields.hasErrors('prioridade')}" th:errors="*{prioridade}"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="clienteId">Cliente</label>
+                    <select class="controle" id="clienteId" th:field="*{clienteId}">
+                        <option value="">Sem vínculo</option>
+                        <option th:each="cliente : ${clientes}" th:value="${cliente.id}"
+                                th:text="${cliente.nome} + ' · ' + ${cliente.setor}"></option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="setor">Setor</label>
+                    <input type="text" class="controle" id="setor" th:field="*{setor}"
+                           placeholder="Ex.: Financeiro">
+                </div>
+
+                <div class="campo largura-total" sec:authorize="hasAnyRole('GERENTE','ADMINISTRADOR')">
+                    <label for="tecnico">Técnico responsável</label>
+                    <select class="controle" id="tecnico" th:field="*{tecnico}">
+                        <option value="">Atribuir depois</option>
+                        <option th:each="tecnico : ${tecnicos}" th:value="${tecnico.email}"
+                                th:text="${tecnico.nome} + ' (' + ${tecnico.perfil} + ')'"></option>
+                    </select>
+                    <div class="ajuda">A atribuição coloca automaticamente o chamado em andamento.</div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
+                <button type="submit" class="botao botao-primario">
+                    <i class="bi bi-check2-circle"></i>
+                    <span th:text="${modoEdicao} ? 'Salvar alterações' : 'Abrir chamado'">Abrir chamado</span>
+                </button>
+                <a th:href="${modoEdicao} ? @{/chamados/{id}(id=${idChamado})} : @{/chamados}"
+                   class="botao botao-claro">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

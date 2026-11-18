@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Painel do gerente</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2>Painel do gerente</h2>
+            <p>Fila de atendimento, produtividade e indicadores da equipe.</p>
+        </div>
+        <a th:href="@{/ajustes-horarios}" class="botao botao-claro">
+            <i class="bi bi-clock-history"></i> Horários de atendimento
+        </a>
+    </div>
+
+    <div class="grade-kpi">
+        <div class="kpi">
+            <div class="kpi-icone azul"><i class="bi bi-ticket-detailed"></i></div>
+            <div>
+                <div class="kpi-valor" th:text="${painel.total}">0</div>
+                <div class="kpi-rotulo">Chamados no período</div>
+            </div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-icone amarelo"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="kpi-valor" th:text="${painel.abertos + painel.emAndamento + painel.aguardando}">0</div>
+                <div class="kpi-rotulo">Na fila de atendimento</div>
+            </div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-icone verde"><i class="bi bi-check2-circle"></i></div>
+            <div>
+                <div class="kpi-valor" th:text="${painel.resolvidos}">0</div>
+                <div class="kpi-rotulo">Resolvidos</div>
+            </div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-icone vermelho"><i class="bi bi-exclamation-triangle"></i></div>
+            <div>
+                <div class="kpi-valor" th:text="${painel.criticos}">0</div>
+                <div class="kpi-rotulo">Críticos em aberto</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grade-painel">
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3>Fila de atendimento</h3>
+                <span th:text="${#lists.size(chamados)} + ' chamado(s)'">0</span>
+            </div>
+
+            <div class="table-responsive" th:if="${!#lists.isEmpty(chamados)}">
+                <table class="tabela">
+                    <thead>
+                    <tr><th>Protocolo</th><th>Chamado</th><th>Prioridade</th><th>Situação</th><th>Técnico</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="chamado : ${chamados}">
+                        <td>
+                            <a th:href="@{/chamados/{id}(id=${chamado.id})}" class="principal"
+                               th:text="${chamado.protocolo}">TD</a>
+                        </td>
+                        <td>
+                            <span th:text="${chamado.titulo}">Título</span>
+                            <span class="secundario" th:text="${chamado.clienteNome} ?: 'Sem cliente'">Cliente</span>
+                        </td>
+                        <td><span class="prioridade" th:classappend="${chamado.prioridade.classe}"
+                                  th:text="${chamado.prioridade.rotulo}">Média</span></td>
+                        <td><span class="selo" th:classappend="${chamado.situacao.classe}"
+                                  th:text="${chamado.situacao.rotulo}">Aberto</span></td>
+                        <td th:text="${chamado.tecnico} ?: 'Não atribuído'">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="vazio" th:if="${#lists.isEmpty(chamados)}">
+                <i class="bi bi-check2-all"></i>
+                <p class="mb-0">Nenhum chamado aguardando atendimento.</p>
+            </div>
+        </div>
+
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3>Carga por técnico</h3>
+            </div>
+
+            <ul class="lista-tecnicos" th:if="${!#lists.isEmpty(painel.cargaTecnicos)}">
+                <li th:each="tecnico : ${painel.cargaTecnicos}">
+                    <span th:text="${tecnico.nome}">Técnico</span>
+                    <span style="color:var(--cor-texto-fraco)">
+                        <span th:text="${tecnico.total}">0</span> chamado(s)
+                    </span>
+                    <div class="barra"><span th:style="'width:' + ${tecnico.percentual} + '%'"></span></div>
+                </li>
+            </ul>
+            <p class="dica-vazia" th:if="${#lists.isEmpty(painel.cargaTecnicos)}">
+                Nenhum chamado atribuído até o momento.
+            </p>
+
+            <hr style="border-color:var(--cor-borda);margin:1.1rem 0">
+
+            <div class="resumo-linha">
+                <span class="rotulo"><i class="bi bi-stopwatch"></i> Tempo médio de resolução</span>
+                <strong th:text="${#numbers.formatDecimal(painel.tempoMedioHoras, 1, 1)} + ' h'">0 h</strong>
+            </div>
+            <div class="resumo-linha">
+                <span class="rotulo"><i class="bi bi-graph-up"></i> Taxa de resolução</span>
+                <strong th:text="${painel.taxaResolucao} + '%'">0%</strong>
+            </div>
+            <div class="resumo-linha">
+                <span class="rotulo"><i class="bi bi-inbox"></i> Aguardando cliente</span>
+                <strong th:text="${painel.aguardando}">0</strong>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

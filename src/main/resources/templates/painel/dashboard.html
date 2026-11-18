@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2>Olá, <span th:text="${nomeUsuario}">usuário</span> 👋</h2>
+            <p th:text="${gestor} ? 'Aqui está o panorama completo da central de atendimento.'
+                                 : 'Aqui está o resumo das suas solicitações de suporte.'">
+                Panorama da central de atendimento.
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="botao botao-claro"><i class="bi bi-calendar3"></i> Últimos 7 dias</span>
+            <a th:href="@{/chamados/novo}" class="botao botao-primario">
+                <i class="bi bi-plus-lg"></i> Novo chamado
+            </a>
+        </div>
+    </div>
+
+    <div class="grade-kpi">
+        <div class="kpi">
+            <div class="kpi-icone azul"><i class="bi bi-ticket-detailed"></i></div>
+            <div>
+                <div class="kpi-valor" th:text="${painel.total}">0</div>
+                <div class="kpi-rotulo">Total de chamados</div>
+                <div class="kpi-detalhe" th:text="${painel.abertosHoje} + ' aberto(s) hoje'">0 abertos hoje</div>
+            </div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-icone amarelo"><i class="bi bi-arrow-repeat"></i></div>
+            <div>
+                <div class="kpi-valor" th:text="${painel.emAndamento}">0</div>
+                <div class="kpi-rotulo">Em andamento</div>
+                <div class="kpi-detalhe" th:text="${painel.abertos} + ' aguardando triagem'">0 aguardando</div>
+            </div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-icone verde"><i class="bi bi-check2-circle"></i></div>
+            <div>
+                <div class="kpi-valor" th:text="${painel.resolvidos}">0</div>
+                <div class="kpi-rotulo">Resolvidos</div>
+                <div class="kpi-detalhe" th:text="'Taxa de resolução de ' + ${painel.taxaResolucao} + '%'">Taxa</div>
+            </div>
+        </div>
+
+        <div class="kpi">
+            <div class="kpi-icone vermelho"><i class="bi bi-exclamation-triangle"></i></div>
+            <div>
+                <div class="kpi-valor" th:text="${painel.criticos}">0</div>
+                <div class="kpi-rotulo">Críticos em aberto</div>
+                <div class="kpi-detalhe">Prioridade crítica sem solução</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grade-painel">
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3>Chamados por situação</h3>
+                <span>Distribuição atual</span>
+            </div>
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+                <div class="grafico" style="flex:1;min-width:200px;max-width:240px">
+                    <canvas id="graficoSituacao"></canvas>
+                </div>
+                <div style="flex:1;min-width:200px">
+                    <div class="resumo-linha" th:each="rotulo, iteracao : ${painel.rotulosSituacao}">
+                        <span class="rotulo">
+                            <span class="ponto-cor"
+                                  th:style="'background:' + ${ {'#0284c7','#d97706','#7c3aed','#16a34a','#dc2626'}[iteracao.index] }"></span>
+                            <span th:text="${rotulo}">Situação</span>
+                        </span>
+                        <strong th:text="${painel.valoresSituacao[iteracao.index]}">0</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3>Volume dos últimos 7 dias</h3>
+                <span>Aberturas por dia</span>
+            </div>
+            <div class="grafico grafico-alto">
+                <canvas id="graficoDias"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="grade-painel">
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3>Chamados recentes</h3>
+                <a th:href="@{/chamados}" style="font-size:.8rem">Ver todos <i class="bi bi-arrow-right"></i></a>
+            </div>
+
+            <div class="table-responsive" th:if="${!#lists.isEmpty(painel.recentes)}">
+                <table class="tabela">
+                    <thead>
+                    <tr><th>Protocolo</th><th>Chamado</th><th>Situação</th><th>Prioridade</th><th>Abertura</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="chamado : ${painel.recentes}">
+                        <td>
+                            <a th:href="@{/chamados/{id}(id=${chamado.id})}" class="principal"
+                               th:text="${chamado.protocolo}">TD</a>
+                        </td>
+                        <td>
+                            <span th:text="${chamado.titulo}">Título</span>
+                            <span class="secundario" th:text="${chamado.clienteNome} ?: 'Sem cliente'">Cliente</span>
+                        </td>
+                        <td><span class="selo" th:classappend="${chamado.situacao.classe}"
+                                  th:text="${chamado.situacao.rotulo}">Aberto</span></td>
+                        <td><span class="prioridade" th:classappend="${chamado.prioridade.classe}"
+                                  th:text="${chamado.prioridade.rotulo}">Média</span></td>
+                        <td th:text="${#temporals.format(chamado.dataAbertura, 'dd/MM HH:mm')}">01/01</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="vazio" th:if="${#lists.isEmpty(painel.recentes)}">
+                <i class="bi bi-inbox"></i>
+                <p class="mb-2">Nenhum chamado registrado ainda.</p>
+                <a th:href="@{/chamados/novo}" class="botao botao-primario botao-pequeno">Abrir o primeiro chamado</a>
+            </div>
+        </div>
+
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3>Desempenho do atendimento</h3>
+            </div>
+
+            <div class="desempenho">
+                <div>
+                    <div class="topo">
+                        <span>Taxa de resolução</span>
+                        <strong th:text="${painel.taxaResolucao} + '%'">0%</strong>
+                    </div>
+                    <div class="barra-progresso">
+                        <span th:style="'width:' + ${painel.taxaResolucao} + '%'"></span>
+                    </div>
+                </div>
+
+                <div class="resumo-linha">
+                    <span class="rotulo"><i class="bi bi-stopwatch"></i> Tempo médio de resolução</span>
+                    <strong th:text="${#numbers.formatDecimal(painel.tempoMedioHoras, 1, 1)} + ' h'">0 h</strong>
+                </div>
+                <div class="resumo-linha">
+                    <span class="rotulo"><i class="bi bi-people"></i> Clientes cadastrados</span>
+                    <strong th:text="${painel.totalClientes}">0</strong>
+                </div>
+                <div class="resumo-linha">
+                    <span class="rotulo"><i class="bi bi-person-badge"></i> Usuários do sistema</span>
+                    <strong th:text="${painel.totalUsuarios}">0</strong>
+                </div>
+            </div>
+
+            <hr style="border-color:var(--cor-borda);margin:1.1rem 0">
+
+            <div class="cartao-titulo" style="margin-bottom:.7rem">
+                <h3 style="font-size:.9rem">Carga por técnico</h3>
+            </div>
+            <ul class="lista-tecnicos" th:if="${!#lists.isEmpty(painel.cargaTecnicos)}">
+                <li th:each="tecnico : ${painel.cargaTecnicos}">
+                    <span th:text="${tecnico.nome}">Técnico</span>
+                    <span style="color:var(--cor-texto-fraco)" th:text="${tecnico.total} + ' chamado(s)'">0</span>
+                    <div class="barra"><span th:style="'width:' + ${tecnico.percentual} + '%'"></span></div>
+                </li>
+            </ul>
+            <p class="dica-vazia" th:if="${#lists.isEmpty(painel.cargaTecnicos)}">
+                Nenhum chamado atribuído a técnicos até o momento.
+            </p>
+        </div>
+    </div>
+
+    <div class="cartao" th:if="${gestor}">
+        <div class="cartao-titulo">
+            <h3>Atalhos de gestão</h3>
+        </div>
+        <div class="atalhos">
+            <a th:href="@{/chamados}" class="atalho"><i class="bi bi-headset"></i> Fila de chamados</a>
+            <a th:href="@{/clientes}" class="atalho"><i class="bi bi-people"></i> Clientes</a>
+            <a th:href="@{/ajustes-horarios}" class="atalho"><i class="bi bi-clock-history"></i> Horários de atendimento</a>
+            <a th:href="@{/gerente/painel}" class="atalho"><i class="bi bi-briefcase"></i> Painel do gerente</a>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script th:inline="javascript">
+        const rotulosSituacao = /*[[${painel.rotulosSituacao}]]*/ [];
+        const valoresSituacao = /*[[${painel.valoresSituacao}]]*/ [];
+        const rotulosDias = /*[[${painel.rotulosDias}]]*/ [];
+        const valoresDias = /*[[${painel.valoresDias}]]*/ [];
+
+        const coresSituacao = ['#0284c7', '#d97706', '#7c3aed', '#16a34a', '#dc2626'];
+
+        new Chart(document.getElementById('graficoSituacao'), {
+            type: 'doughnut',
+            data: {
+                labels: rotulosSituacao,
+                datasets: [{
+                    data: valoresSituacao,
+                    backgroundColor: coresSituacao,
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                cutout: '68%',
+                maintainAspectRatio: false,
+                plugins: {legend: {display: false}}
+            }
+        });
+
+        new Chart(document.getElementById('graficoDias'), {
+            type: 'bar',
+            data: {
+                labels: rotulosDias,
+                datasets: [{
+                    label: 'Chamados abertos',
+                    data: valoresDias,
+                    backgroundColor: 'rgba(37, 99, 235, .75)',
+                    borderRadius: 6,
+                    maxBarThickness: 34
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {legend: {display: false}},
+                scales: {
+                    x: {grid: {display: false}, border: {display: false}},
+                    y: {beginAtZero: true, ticks: {precision: 0}, grid: {color: 'rgba(148, 163, 184, .2)'}, border: {display: false}}
+                }
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

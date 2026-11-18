@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Horários de atendimento</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2>Horários de atendimento</h2>
+            <p>Defina as janelas de atendimento por setor.</p>
+        </div>
+    </div>
+
+    <div class="grade-painel igual">
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3><i class="bi bi-clock-history me-1"></i> Janelas cadastradas</h3>
+                <span th:text="${#lists.size(horarios)} + ' horário(s)'">0</span>
+            </div>
+
+            <div class="table-responsive" th:if="${!#lists.isEmpty(horarios)}">
+                <table class="tabela">
+                    <thead>
+                    <tr><th>Setor</th><th>Dia</th><th>Início</th><th>Fim</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="horario : ${horarios}">
+                        <td class="principal" th:text="${horario.setor}">Setor</td>
+                        <td th:text="${horario.diaSemana}">Segunda</td>
+                        <td th:text="${horario.horarioInicio}">08:00</td>
+                        <td th:text="${horario.horarioFim}">18:00</td>
+                        <td class="acoes">
+                            <form th:action="@{/ajustes-horarios/{id}/excluir(id=${horario.id})}" method="post"
+                                  data-confirmar="Remover este horário?">
+                                <button type="submit" class="botao botao-perigo botao-pequeno">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="vazio" th:if="${#lists.isEmpty(horarios)}">
+                <i class="bi bi-alarm"></i>
+                <p class="mb-0">Nenhum horário cadastrado.</p>
+            </div>
+        </div>
+
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3><i class="bi bi-plus-circle me-1"></i> Novo horário</h3>
+            </div>
+
+            <form th:action="@{/ajustes-horarios}" th:object="${horarioForm}" method="post">
+                <div class="campo">
+                    <label for="setor">Setor</label>
+                    <input type="text" class="controle" id="setor" th:field="*{setor}" placeholder="Ex.: Suporte">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('setor')}" th:errors="*{setor}"></div>
+                </div>
+                <div class="campo">
+                    <label for="diaSemana">Dia da semana</label>
+                    <select class="controle" id="diaSemana" th:field="*{diaSemana}">
+                        <option value="">Selecione</option>
+                        <option value="Segunda-feira">Segunda-feira</option>
+                        <option value="Terça-feira">Terça-feira</option>
+                        <option value="Quarta-feira">Quarta-feira</option>
+                        <option value="Quinta-feira">Quinta-feira</option>
+                        <option value="Sexta-feira">Sexta-feira</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                    </select>
+                    <div class="erro-campo" th:if="${#fields.hasErrors('diaSemana')}" th:errors="*{diaSemana}"></div>
+                </div>
+                <div class="grade-formulario">
+                    <div class="campo">
+                        <label for="horarioInicio">Início</label>
+                        <input type="time" class="controle" id="horarioInicio" th:field="*{horarioInicio}">
+                        <div class="erro-campo" th:if="${#fields.hasErrors('horarioInicio')}" th:errors="*{horarioInicio}"></div>
+                    </div>
+                    <div class="campo">
+                        <label for="horarioFim">Fim</label>
+                        <input type="time" class="controle" id="horarioFim" th:field="*{horarioFim}">
+                        <div class="erro-campo" th:if="${#fields.hasErrors('horarioFim')}" th:errors="*{horarioFim}"></div>
+                    </div>
+                </div>
+                <button type="submit" class="botao botao-primario w-100">
+                    <i class="bi bi-check2"></i> Cadastrar horário
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="mensagens">
+    <div class="alerta alerta-sucesso" th:if="${sucesso}">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${sucesso}">Operação realizada com sucesso.</span>
+    </div>
+    <div class="alerta alerta-erro" th:if="${erro}">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${erro}">Não foi possível concluir a operação.</span>
+    </div>
+    <div class="alerta alerta-info" th:if="${aviso}">
+        <i class="bi bi-info-circle-fill"></i>
+        <span th:text="${aviso}">Informação.</span>
+    </div>
+</div>
+</body>
+</html>

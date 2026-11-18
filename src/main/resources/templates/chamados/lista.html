@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Chamados</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2>Chamados</h2>
+            <p th:text="${gestor} ? 'Todos os chamados registrados na central de serviços.'
+                                 : 'Acompanhe as solicitações abertas por você.'">
+                Todos os chamados registrados.
+            </p>
+        </div>
+        <a th:href="@{/chamados/novo}" class="botao botao-primario">
+            <i class="bi bi-plus-lg"></i> Novo chamado
+        </a>
+    </div>
+
+    <div class="cartao" style="margin-bottom:1rem">
+        <form method="get" th:action="@{/chamados}" class="filtros">
+            <input type="text" name="busca" class="controle busca" placeholder="Buscar por protocolo, título ou cliente"
+                   th:value="${busca}">
+            <select name="situacao" class="controle">
+                <option value="">Todas as situações</option>
+                <option th:each="item : ${situacoes}" th:value="${item}"
+                        th:text="${item.rotulo}" th:selected="${item == situacaoSelecionada}"></option>
+            </select>
+            <select name="prioridade" class="controle">
+                <option value="">Todas as prioridades</option>
+                <option th:each="item : ${prioridades}" th:value="${item}"
+                        th:text="${item.rotulo}" th:selected="${item == prioridadeSelecionada}"></option>
+            </select>
+            <label class="botao botao-claro" th:if="${gestor}" style="cursor:pointer">
+                <input type="checkbox" name="meus" value="true" th:checked="${meus}" class="me-1">
+                Somente meus
+            </label>
+            <button type="submit" class="botao botao-primario"><i class="bi bi-funnel"></i> Filtrar</button>
+            <a th:href="@{/chamados}" class="botao botao-claro">Limpar</a>
+        </form>
+    </div>
+
+    <div class="cartao">
+        <div class="cartao-titulo">
+            <h3>Resultados</h3>
+            <span th:text="${#lists.size(chamados)} + ' chamado(s)'">0 chamados</span>
+        </div>
+
+        <div class="table-responsive" th:if="${!#lists.isEmpty(chamados)}">
+            <table class="tabela">
+                <thead>
+                <tr>
+                    <th>Protocolo</th>
+                    <th>Chamado</th>
+                    <th>Prioridade</th>
+                    <th>Situação</th>
+                    <th>Técnico</th>
+                    <th>Abertura</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="chamado : ${chamados}">
+                    <td><span class="principal" th:text="${chamado.protocolo}">TD-2026-0001</span></td>
+                    <td>
+                        <span class="principal" th:text="${chamado.titulo}">Título</span>
+                        <span class="secundario">
+                            <span th:text="${chamado.clienteNome} ?: 'Sem cliente vinculado'">Cliente</span>
+                            <span th:if="${chamado.setor}" th:text="' · ' + ${chamado.setor}"></span>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="prioridade" th:classappend="${chamado.prioridade.classe}"
+                              th:text="${chamado.prioridade.rotulo}">Média</span>
+                    </td>
+                    <td>
+                        <span class="selo" th:classappend="${chamado.situacao.classe}"
+                              th:text="${chamado.situacao.rotulo}">Aberto</span>
+                    </td>
+                    <td th:text="${chamado.tecnico} ?: 'Não atribuído'">Técnico</td>
+                    <td th:text="${#temporals.format(chamado.dataAbertura, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
+                    <td class="acoes">
+                        <a th:href="@{/chamados/{id}(id=${chamado.id})}" class="botao botao-claro botao-pequeno">
+                            <i class="bi bi-arrow-right"></i> Abrir
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="vazio" th:if="${#lists.isEmpty(chamados)}">
+            <i class="bi bi-inbox"></i>
+            <p class="mb-2">Nenhum chamado encontrado com os filtros atuais.</p>
+            <a th:href="@{/chamados/novo}" class="botao botao-primario botao-pequeno">Abrir chamado</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

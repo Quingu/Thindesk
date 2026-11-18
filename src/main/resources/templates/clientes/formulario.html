@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${modoEdicao} ? 'Editar cliente' : 'Novo cliente'">Cliente</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2 th:text="${modoEdicao} ? 'Editar cliente' : 'Novo cliente'">Novo cliente</h2>
+            <p>Dados usados na abertura e no acompanhamento dos chamados.</p>
+        </div>
+        <a th:href="@{/clientes}" class="botao botao-claro"><i class="bi bi-arrow-left"></i> Voltar</a>
+    </div>
+
+    <div class="cartao">
+        <form th:action="${modoEdicao} ? @{/clientes/{id}/editar(id=${idCliente})} : @{/clientes/novo}"
+              th:object="${clienteForm}" method="post">
+            <div class="grade-formulario">
+                <div class="campo largura-total">
+                    <label for="nome">Nome do cliente</label>
+                    <input type="text" class="controle" id="nome" th:field="*{nome}" placeholder="Nome da empresa">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+                </div>
+                <div class="campo">
+                    <label for="telefone">Telefone</label>
+                    <input type="text" class="controle" id="telefone" th:field="*{telefone}" placeholder="(00) 00000-0000">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></div>
+                </div>
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input type="email" class="controle" id="email" th:field="*{email}" placeholder="contato@empresa.com">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+                <div class="campo">
+                    <label for="setor">Setor</label>
+                    <input type="text" class="controle" id="setor" th:field="*{setor}" placeholder="Ex.: Financeiro">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('setor')}" th:errors="*{setor}"></div>
+                </div>
+                <div class="campo">
+                    <label for="ativo">Situação</label>
+                    <select class="controle" id="ativo" th:field="*{ativo}">
+                        <option th:value="true">Ativo</option>
+                        <option th:value="false">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
+                <button type="submit" class="botao botao-primario">
+                    <i class="bi bi-check2-circle"></i>
+                    <span th:text="${modoEdicao} ? 'Salvar alterações' : 'Cadastrar cliente'">Cadastrar</span>
+                </button>
+                <a th:href="@{/clientes}" class="botao botao-claro">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

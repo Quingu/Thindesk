@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: thindesk
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /login
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: APP_SEMENTE_DADOS
+        value: "true"
+      - key: APP_TEMA
+        value: padrao

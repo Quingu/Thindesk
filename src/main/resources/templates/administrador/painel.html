@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Administração</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2>Administração</h2>
+            <p>Gerencie usuários, perfis e permissões de acesso ao sistema.</p>
+        </div>
+        <a th:href="@{/chamados}" class="botao botao-claro"><i class="bi bi-headset"></i> Ver chamados</a>
+    </div>
+
+    <div class="cartao">
+        <div class="cartao-titulo">
+            <h3>Usuários cadastrados</h3>
+            <span th:text="${#lists.size(usuarios)} + ' usuário(s)'">0</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="tabela">
+                <thead>
+                <tr><th>Usuário</th><th>Perfil atual</th><th>Situação</th><th>Alterar perfil</th><th>Ações</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="usuario : ${usuarios}">
+                    <td>
+                        <span class="principal" th:text="${usuario.nome}">Nome</span>
+                        <span class="secundario" th:text="${usuario.email}">email</span>
+                    </td>
+                    <td><span class="selo selo-aberto" th:text="${usuario.perfil}">USUARIO</span></td>
+                    <td>
+                        <span class="selo" th:classappend="${usuario.ativo} ? 'selo-resolvido' : 'selo-cancelado'"
+                              th:text="${usuario.ativo} ? 'Ativo' : 'Inativo'">Ativo</span>
+                    </td>
+                    <td>
+                        <form th:action="@{/administrador/promover/{id}(id=${usuario.id})}" method="post"
+                              class="d-flex gap-2">
+                            <select name="perfil" class="controle" style="min-width:150px">
+                                <option th:each="item : ${perfis}" th:value="${item}" th:text="${item}"
+                                        th:selected="${item == usuario.perfil}"></option>
+                            </select>
+                            <button type="submit" class="botao botao-claro botao-pequeno">Aplicar</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form th:action="@{/administrador/ativar/{id}(id=${usuario.id})}" method="post"
+                              data-confirmar="Alterar a situação deste usuário?">
+                            <button type="submit" class="botao botao-perigo botao-pequeno"
+                                    th:text="${usuario.ativo} ? 'Desativar' : 'Ativar'">Desativar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="alerta alerta-info mt-3">
+        <i class="bi bi-shield-check"></i>
+        O sistema exige ao menos um administrador e impede que você desative a própria conta.
+    </div>
+</div>
+</body>
+</html>

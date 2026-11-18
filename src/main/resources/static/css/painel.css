@@ -1,0 +1,121 @@
+.painel-cartao {
+    height: 100%;
+}
+
+.painel-cartao .icone {
+    width: 42px;
+    height: 42px;
+    border-radius: .7rem;
+    background: var(--cor-primaria-clara);
+    color: var(--cor-primaria-escura);
+    display: grid;
+    place-items: center;
+    font-size: 1.15rem;
+    margin-bottom: .8rem;
+}
+
+.grafico {
+    position: relative;
+    min-height: 240px;
+}
+
+.grafico-alto {
+    min-height: 280px;
+}
+
+.resumo-linha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: .84rem;
+    padding: .45rem 0;
+}
+
+.resumo-linha .rotulo {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    color: var(--cor-texto-fraco);
+}
+
+.resumo-linha .ponto-cor {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+.resumo-linha strong {
+    font-weight: 600;
+}
+
+.desempenho {
+    display: grid;
+    gap: 1.1rem;
+}
+
+.desempenho .topo {
+    display: flex;
+    justify-content: space-between;
+    font-size: .82rem;
+    margin-bottom: .35rem;
+}
+
+.lista-tecnicos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: .85rem;
+}
+
+.lista-tecnicos li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: .35rem .8rem;
+    font-size: .84rem;
+}
+
+.lista-tecnicos .barra {
+    grid-column: 1 / -1;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--cor-fundo);
+    overflow: hidden;
+}
+
+.lista-tecnicos .barra span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--cor-primaria), #60a5fa);
+}
+
+.atalhos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .7rem;
+}
+
+.atalho {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: .8rem .9rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: .7rem;
+    color: var(--cor-texto);
+    font-size: .84rem;
+    font-weight: 500;
+    transition: all .15s ease;
+}
+
+.atalho:hover {
+    border-color: var(--cor-primaria);
+    color: var(--cor-primaria);
+    background: rgba(37, 99, 235, .04);
+}
+
+.atalho i {
+    font-size: 1.05rem;
+}

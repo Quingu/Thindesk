@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer th:fragment="rodape" class="rodape">
+    Thindesk · Sistema de controle de chamados técnicos ·
+    <span th:text="${@environment.getProperty('app.versao','1.0.0')}">1.0.0</span>
+</footer>
+</body>
+</html>

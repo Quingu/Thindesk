@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Meu perfil</title>
+</head>
+<body>
+<div layout:fragment="conteudo">
+    <div class="cabecalho-pagina">
+        <div>
+            <h2>Meu perfil</h2>
+            <p>Informações da conta e segurança de acesso.</p>
+        </div>
+    </div>
+
+    <div class="detalhe-grade">
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3><i class="bi bi-person-badge me-1"></i> Dados cadastrais</h3>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="avatar" style="width:64px;height:64px;font-size:1.3rem"
+                     th:text="${#strings.substring(usuario.nome, 0, 2).toUpperCase()}">TD</div>
+                <div>
+                    <div style="font-size:1.1rem;font-weight:700" th:text="${usuario.nome}">Nome</div>
+                    <div style="font-size:.85rem;color:var(--cor-texto-fraco)" th:text="${usuario.email}">email</div>
+                    <span class="selo selo-aberto mt-1" th:text="${usuario.perfil}">USUARIO</span>
+                </div>
+            </div>
+
+            <ul class="lista-dados">
+                <li><span class="rotulo">Nome</span><strong th:text="${usuario.nome}">Nome</strong></li>
+                <li><span class="rotulo">E-mail</span><strong th:text="${usuario.email}">E-mail</strong></li>
+                <li><span class="rotulo">Perfil de acesso</span><strong th:text="${usuario.perfil}">Perfil</strong></li>
+                <li><span class="rotulo">Situação</span>
+                    <strong th:text="${usuario.ativo} ? 'Ativo' : 'Inativo'">Ativo</strong>
+                </li>
+                <li>
+                    <span class="rotulo">Conta criada em</span>
+                    <strong th:text="${#temporals.format(usuario.dataCriacao, 'dd/MM/yyyy HH:mm')}">data</strong>
+                </li>
+                <li>
+                    <span class="rotulo">Última atualização</span>
+                    <strong th:text="${#temporals.format(usuario.dataAtualizacao, 'dd/MM/yyyy HH:mm')}">data</strong>
+                </li>
+            </ul>
+        </div>
+
+        <div class="cartao">
+            <div class="cartao-titulo">
+                <h3><i class="bi bi-shield-lock me-1"></i> Alterar senha</h3>
+            </div>
+
+            <form th:action="@{/perfil/senha}" th:object="${alteracaoSenha}" method="post">
+                <div class="campo">
+                    <label for="senhaAtual">Senha atual</label>
+                    <input type="password" class="controle" id="senhaAtual" th:field="*{senhaAtual}"
+                           autocomplete="current-password">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('senhaAtual')}" th:errors="*{senhaAtual}"></div>
+                </div>
+                <div class="campo">
+                    <label for="novaSenha">Nova senha</label>
+                    <input type="password" class="controle" id="novaSenha" th:field="*{novaSenha}"
+                           autocomplete="new-password">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('novaSenha')}" th:errors="*{novaSenha}"></div>
+                </div>
+                <div class="campo">
+                    <label for="confirmacao">Confirmar nova senha</label>
+                    <input type="password" class="controle" id="confirmacao" th:field="*{confirmacao}"
+                           autocomplete="new-password">
+                    <div class="erro-campo" th:if="${#fields.hasErrors('confirmacao')}" th:errors="*{confirmacao}"></div>
+                </div>
+                <button type="submit" class="botao botao-primario">
+                    <i class="bi bi-check2"></i> Atualizar senha
+                </button>
+            </form>
+
+            <div class="alerta alerta-info mt-3 mb-0">
+                <i class="bi bi-info-circle-fill"></i>
+                A senha é armazenada com criptografia BCrypt. Nenhum usuário do sistema consegue visualizá-la.
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -4,7 +4,7 @@ Sistema corporativo de **controle de chamados técnicos** desenvolvido com **Jav
 
 A aplicação centraliza a abertura, a triagem e a resolução de solicitações de suporte, com perfis de acesso para **usuário**, **gerente** e **administrador**, além de um dashboard com indicadores de atendimento.
 
-![Versão](https://img.shields.io/badge/vers%C3%A3o-1.0.1-2563eb)
+![Versão](https://img.shields.io/badge/vers%C3%A3o-1.0.2-2563eb)
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.0-6db33f)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-13aa52)
@@ -126,7 +126,7 @@ O projeto adota o **Versionamento Semântico 2.0.0**, conforme a especificação
 ### Versão atual
 
 ```text
-1.0.1
+1.0.2
 ```
 
 O formato utilizado é:
@@ -156,6 +156,7 @@ MAJOR.MINOR.PATCH[-pre-release][+build]
 | `1.0.0-beta.1` | `v1.0.0-beta.1` | Versão de homologação da release 1.0.0 |
 | `1.0.0` | `v1.0.0` | Primeira versão estável, publicada em produção |
 | `1.0.1` | `v1.0.1` | Correção do build da imagem Docker e publicação do deploy |
+| `1.0.2` | `v1.0.2` | Ajuste dos dados de demonstração e do print do dashboard |
 
 ### Regras adotadas
 
@@ -247,14 +248,14 @@ desativado com `APP_SEMENTE_DADOS=false`.
 | `MONGODB_DATABASE` | `thindesk` | Nome do banco de dados |
 | `PORT` | `8080` | Porta HTTP da aplicação |
 | `APP_TEMA` | `padrao` | Tema visual (`padrao` ou `escuro`) |
-| `APP_VERSAO` | `1.0.1` | Versão exibida na interface |
+| `APP_VERSAO` | `1.0.2` | Versão exibida na interface |
 | `APP_SEMENTE_DADOS` | `true` | Insere dados de demonstração em base vazia |
 
 ### Build
 
 ```bash
 ./mvnw clean package
-java -jar target/thindesk-1.0.1.jar
+java -jar target/thindesk-1.0.2.jar
 ```
 
 ### Docker
@@ -346,6 +347,11 @@ main
  └── hotfix/1.0.1
 main <── merge hotfix/1.0.1 (tag v1.0.1)
 develop <── merge hotfix/1.0.1
+
+main
+ └── hotfix/1.0.2
+main <── merge hotfix/1.0.2 (tag v1.0.2)
+develop <── merge hotfix/1.0.2
 ```
 
 Regras aplicadas:
@@ -355,6 +361,7 @@ Regras aplicadas:
 - `feature/*` nasce de `develop` e retorna para `develop` via merge;
 - `release/1.0.0` estabiliza a versão, recebe documentação e deploy;
 - `hotfix/1.0.1` corrige a falha de build em produção e retorna para `main` e `develop`;
+- `hotfix/1.0.2` ajusta os dados de demonstração e o print do dashboard;
 - cada branch foi criada com intervalo de **10 a 15 minutos** da anterior, mantendo o histórico de evolução do projeto.
 
 Para visualizar o histórico:

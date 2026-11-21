@@ -190,7 +190,7 @@ O dashboard apresenta:
 
 | Ambiente | Endereço |
 | --- | --- |
-| Aplicação publicada | `https://thindesk.onrender.com` |
+| Aplicação publicada | `https://thindesk-yeat.onrender.com` |
 | Repositório | https://github.com/Quingu/Thindesk |
 
 > O deploy é feito no **Render** a partir do `Dockerfile` deste repositório, com os dados persistidos no **MongoDB Atlas**.

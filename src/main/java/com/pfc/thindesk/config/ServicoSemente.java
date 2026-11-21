@@ -51,7 +51,7 @@ public class ServicoSemente implements CommandLineRunner {
             return;
         }
 
-        Usuario ana = criarUsuario("Ana Martins", "admin@thindesk.com", Perfil.ADMINISTRADOR);
+        Usuario gustavo = criarUsuario("Gustavo Quintiliano", "admin@thindesk.com", Perfil.ADMINISTRADOR);
         Usuario bruno = criarUsuario("Bruno Carvalho", "gerente@thindesk.com", Perfil.GERENTE);
         Usuario carla = criarUsuario("Carla Souza", "usuario@thindesk.com", Perfil.USUARIO);
         Usuario diego = criarUsuario("Diego Lima", "tecnico@thindesk.com", Perfil.GERENTE);
